@@ -1,5 +1,3 @@
-# Notes — raw scratchpad
-
 Lab 01 - SSH Bruteforce Detection
 
 THe Scenario:
