@@ -1,29 +1,51 @@
-to start I made a cron for my project, considering my device i thought it would  be a good idea
-to back up my device. I used a simple 12 hour loop. My first step is to look into this auth.log from a Linux server. 
-The (fictional) security team from Osiris&Co suspects someone is brute-forcing SSH logins. 
+# Notes — raw scratchpad
 
-So my job is to write a Python script that parses auth.log and extracts failed SSH login attempts, as well as counting failures per IP addresse which I ca flag any IP that exceeds a threshold (e.g. 5 failures).
-Then it will print a clean report of everything: flagged IPs, failure counts, and the usernames that were targeted. 
+Lab 01 - SSH Bruteforce Detection
 
-To really start I had to do some research to remind myself important steps in this type of incident. I have an Obsidian vault with all my notes from studying and applying my skills. So after consulting a few notes I had to ask myself a few questions:
-WHat type of failed login lines stand out as useful?
+THe Scenario:
+The fictional security team at Osiris&Co suspects someone is brute-forcing SSH logins.
+My Goal: write a Python script that parses auth.log, extracts failed SSH login attempts, counts failures per IP, flags any IP exceeding a threshold, and prints a clean report.
+
+The Questions I asked before building
+
+What type of failed login lines stand out as useful?
+THere is three patterns -> `Failed password for <user>`, `Invalid user <user>`, and `Failed password for invalid user <user>`. The last one is a mix, it contains both "for" and "invalid user", so username extraction had to handle it carefully or it would pull "invalid" as the username instead of the real one.
 
 Is there a correlating IP address?
+Yes, both line types consistently include `from <ip>`, which makes it possible to group everything by attacker.
 
-Is there any other type of failed messaged or just the one pattern?
+Is there any other type of failed message or just the one pattern?
+At least two that I handled. In a real environment there would also be things like "maximum authentication attempts exceeded" and PAM failures. The script ignores those for now, but something to build on in future.
 
-I am used a generated auth.log, so what would break in my code if it was bigger than 10GB?
+What would break if the log was bigger than 10GB?
+Nothing. Using `with open()` and iterating line by line means Python never loads the whole file into memory. The dictionaries only grow with unique IPs, not file size. Right call made without fully realising it at the time.
 
-Is my code ready to flag the same IP if it appears in both "Failed" and "Invalid line"?
+Is the script ready to flag the same IP across both line types?
+Yes both types feed into the same dictionary so the count accumulates regardless of which pattern triggered it. Confirmed in testing.
 
+---
 
+## Development journal 
 
-So I played around with making the script, tested it, failed, fixed it, next synthax error (putting a s where a s shoulkd not be). Lots of imperfections.
+I parsed the log line by line, extracted IPs and usernames into dictionaries, printed a report. Got it working but the code was flat and untested bigger logs or adaptable cases.
 
-I initially wanted to use a break expect, but I didnt filter any errors through so I was just giving it a chance to say nothing, wouldnt be able to fix anything if it doesnt say anything. So I removed it. I could "except '.error'" something...
+Bugs found and fixed
+- `line.splits()` typo, my first instance of syntax ;) Fixed to `line.split()`.
+- Username extraction pulled "invalid" instead of the real username on `Failed password for invalid user` lines. Fixed by checking for the "invalid user " prefix before splitting.
+- Sort was ordering by IP string alphabetically instead of by failure count. I basically had to do a little refresher on lambda and added `key=lambda x: x[1]`.
+- `except: pass` replaced — was silently swallowing errors with no useful purpose.
+- Replaced dot-counting loop with `re.search()`. More reliable.
+- Wrapped parsing logic into `parse_log(filepath)` and reporting into `print_report()`. `parse_log` returns the two dictionaries; `print_report` takes them in and handles clean display.
+- Hardcoded absolute path replaced — `auth_log_file` was pointing to `/home/peachy/...` which only exists on my machine. Anyone cloning the repo would hit a `FileNotFoundError` immediately. Fixed with `os.path.join(os.path.dirname(__file__), "auth.log")` so the script always looks for `auth.log` relative to wherever the script itself lives, not my specific machine.
 
-I had a few typos, had to go through my notes on regex and a forum to include it, much better than a dot-counting method...
-I also had to catch up on lambda.
+---
 
-My script works, it gives out the excpected output and could use more polishing. I am going to try new auth.logs to see if it can adapt.
- 
+Testing
+
+Generated a larger auth.log with specific cases to stress-test the script:
+- an IP with exactly 4 failures (since threshold is 5, wanted to test)worked!
+- IP spreading 6 attempts over 3 hours, flagged!
+- Mixed `Invalid user` and `Failed password` for same IP, merged into one entry
+- `Failed password for invalid user osiris` reported `osiris`, not `invalid`
+- Noise lines (session opened, sudo, accepted) ignored
+- All SSH activity sorted by count descending
