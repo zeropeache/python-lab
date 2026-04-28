@@ -1,4 +1,4 @@
-# first and foremost we need to read the log
+# first and foremost we need to make sure the right file is read
 auth_log_file = "/home/peachy/Projects/python-lab/linux/01_ssh_bruteforce/auth.log"
 
 # making a dictionary of ip addresses fails and usernames in the log
@@ -12,24 +12,21 @@ with open(auth_log_file, 'r') as file:
 		if "Failed password" in line or "Invalid user" in line:
 
 			# Exctracting IP adresses 
-			ip = None
-			parts = line.split()
-			for part in parts: 
-				if part.count('.') ==3: # ip addresses have 3 dots so I am looking for lines with 3 dots...Learnt this from a random reddit post
-					try:
-						numbers = part.split('.')
-						if len(numbers) == 4:
-							ip = part
-							break	
-					except: 
-						pass
+			import re
+			ip_match = re.search(r'\b(\d{1,3}\.){3}\d{1,3}\b', line)
+			ip = ip_match.group() if ip_match else None
+
 			# EXtracting usernames
 			username = "unknown"
 			if "for" in line:
-				user_part = line.split("for")[1].split()[0]
-				username= user_part
+				user_part = line.split("for")[1].strip()
+
+				if user_part.startswith("invalid user "):
+					username = user_part.split()[2]
+				else:
+					username = user_part.split()[0]
 			elif "Invalid user" in line:
-				words = line.splits()
+				words = line.split()
 				for i, word in enumerate(words):
 					if word == "Invalid" and i+2 < len(words):
 						username = words[i+2]
@@ -69,8 +66,8 @@ else:
 
 print("\n" + "_"*60)
 print("ALL SSH ACTIVITY:\n")
-
-all_ips = sorted(ip_failures.items(), reverse=True)
+# Had to learn morea bout lambda for this
+all_ips = sorted(ip_failures.items(), key=lambda x: x[1], reverse=True)
 for ip, count in all_ips:
 	status = "FLAGGED" if count >= threshold else "pass"
 	users = ', '.join(ip_usernames[ip])
