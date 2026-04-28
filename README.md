@@ -1,6 +1,6 @@
 Python Lab
 
-A personal cybersecurity Python lab. Each project is a standalone script built to practice Python and security concepts — from log analysis to network tooling.
+A personal cybersecurity Python lab. Each project is a standalone script built to practice Python and security concepts. From log analysis to network tooling.
 
 Labs
 
