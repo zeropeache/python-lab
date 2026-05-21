@@ -67,5 +67,9 @@ def print_report(ip_failures, ip_usernames, threshold):
 		print(f"{status} {ip:15} | Attempts: {count:3} | Users: {users}")
 	print("\n" + "_"*60 + "\n")
 
-ip_failures, ip_usernames = parse_log(auth_log_file)
-print_report(ip_failures, ip_usernames, threshold)
+def main():
+	ip_failures, ip_usernames = parse_log(auth_log_file)
+	print_report(ip_failures, ip_usernames, threshold)
+
+if __name__ == "__main__":
+	main()
