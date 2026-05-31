@@ -6,9 +6,11 @@ def parse_ports(port_str):
 	for part in port_str.split(","):
 		if "-" in part:
 			start, end = part.split("-") 
-			ports.extend(range(int(start), int(end))
-		else: 
+			ports.extend(range(int(start), int(end) + 1))
+		else:
 			ports.append(int(part))
+	return ports
+
 def grab_banner(sock):
 	try:
 		banner = sock.recv(1024).decode(errors="ignore").strip()
@@ -21,14 +23,16 @@ def scan_port(target, port, timeout):
 	sock.settimeout(timeout)
 	try:
 		result = sock.connect_ex((target, port))
-		if result = 0:
+		if result == 0:
 			banner = grab_banner(sock)
 			sock.close()
 			return True, banner
 		sock.close()
 		return False, ""
+	except OSError:
+		return False, ""
 
-def main()
+def main():
 	parser = argparse.ArgumentParser(description="Simple port scanner")
 	parser.add_argument("target", help="IP address or hostname to scan")
 	parser.add_argument("-p", "--ports", default="1-65535", help="POrts to scan: 22, 20-100, or 22,80,443")

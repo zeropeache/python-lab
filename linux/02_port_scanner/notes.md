@@ -33,13 +33,14 @@ Because filtered ports don't say no, they just go silent. So if a port is filter
 socket.gethostbyname() throws a gaierror and the script crashes hard with no useful message. Wrapping it in a try/except and printing something readable was one of the first things I fixed.
 
 ---
+Edits i've done
 
 ## Exemple of what it looks like in use
 
-# You can do a default ports (1-1024) scan on your own machine
-python port_scanner.py -t 5.0 127.0.0.1
+You can do a default ports 1-1024 scan on your own machine
+python port_scanner.py -p 1-1024 -t 5.0 127.0.0.1
 OR
-python3 port_scanner.py -t 5.0 127.0.0.1
+python3 port_scanner.py -p 1-1024 -t 5.0 127.0.0.1
  
 ```
 Resolving hostname...
