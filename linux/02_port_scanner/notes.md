@@ -32,3 +32,28 @@ Because filtered ports don't say no, they just go silent. So if a port is filter
 
 socket.gethostbyname() throws a gaierror and the script crashes hard with no useful message. Wrapping it in a try/except and printing something readable was one of the first things I fixed.
 
+---
+
+## Exemple of what it looks like in use
+
+# You can do a default ports (1-1024) scan on your own machine
+python port_scanner.py -t 5.0 127.0.0.1
+OR
+python3 port_scanner.py -t 5.0 127.0.0.1
+ 
+```
+Resolving hostname...
+Target: 127.0.0.1 (127.0.0.1)
+Scanning 1024 ports...
+
+[OPEN] Port 22 — SSH-2.0-OpenSSH_8.9
+[OPEN] Port 80
+[OPEN] Port 443
+
+__________________________________________________
+SCAN COMPLETE
+Open ports found: 3
+__________________________________________________
+```
+
+nice :)
