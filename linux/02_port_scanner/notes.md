@@ -1,11 +1,11 @@
 Lab 02 - Port Scanner
 
-The Scenario
+The task is to make scanner that finds which TCP ports are open on a box, retrieve that information and then you can utilise that info to close or block a port. THis kind of script you can do some recon for pentesting, like before attacking a box you need to know the attack surface. Which ports are open tells you what services could be running, the usual ones like SSH on 22, a web server on 80/443. 
+OR you can do network scanning, like if you have unexpected ports listening. I am learning how tcp works so writing one from scratch shows the TCP handshake, what "open" vs "filtered" vs "closed" actually means at the socket level. I can understand nmap even more now.  nmap does everything my script does but faster. Of course with deeper detection, service version detection, and scripting.  
 
-The task is to fingerprint the box: which TCP ports are open, and what's sitting behind them, what if I didn't use nmap? What if I made my own!
+My script is essentially a baby nmap. If you find yourself on a machine that specifically doesn't have nmap installed and you can run my script! like a ctf or something. :)
 
 !!! Only point this at boxes you own or have written permission to test. Scanning random infrastructure is obviously illegal, you can use pythons 8080 or use it on your own machine.
-
 ---
 
 Questions I ask myself through this process
