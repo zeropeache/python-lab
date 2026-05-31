@@ -30,7 +30,7 @@ Yes both types feed into the same dictionary so the count accumulates regardless
 - `except: pass` replaced, it was silently swallowing errors...
 - Replaced dot-counting loop with `re.search()`. More reliable based on research beyong my knowledge o.o
 - Wrapped parsing logic into `parse_log(filepath)``print_report()``parse_log'`print_report' takes them in and handles clean display.
-- absolute path was pushed oups. `auth_log_file` was pointing to `/home/peachy/...` which only exists on my machine. Anyone cloning the repo would hit a error immediately. Fixed it with the `os.path.join(os.path.dirname(__file__), "auth.log")` so the script always looks for `auth.log` relative to wherever the script itself lives, used Claude Code to acknowledge that mistake.
+- absolute path was pushed oups. `auth_log_file` was pointing to an absolute path which only exists on my machine. Anyone cloning the repo would hit a error immediately. Fixed it with the `os.path.join(os.path.dirname(__file__), "auth.log")` so the script always looks for `auth.log` relative to wherever the script itself lives, used Claude Code to acknowledge that mistake.
 
 ---
 
